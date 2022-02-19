@@ -170,3 +170,37 @@ concat' = fold append Nil
 
 flatMap :: (a -> List b) -> List a -> List b
 flatMap f xs = concat' (fmap f xs)
+
+take' :: Int -> List a -> List a
+take' _ Nil = Nil
+take' 0 _ = Nil
+take' n (Cons x xs) = Cons x (take' (n - 1) xs) -- TODO: Guard for negative n.
+
+newtype ZipList' a =
+    ZipList' (List a)
+    deriving (Eq, Show)
+
+instance Eq a => EqProp (ZipList' a) where
+    xs =-= ys = xs' `eq` ys'
+        where xs' = let (ZipList' l) = xs
+                    in take' 3000 l
+              ys' = let (ZipList' l) = ys
+                    in take' 3000 l
+
+instance Arbitrary a => Arbitrary (ZipList' a) where
+    arbitrary = liftM ZipList' arbitrary
+
+instance Functor ZipList' where
+    fmap f (ZipList' xs) =
+        ZipList' $ fmap f xs
+
+repeat' :: a -> List a
+repeat' a = Cons a (repeat' a)
+
+instance Applicative ZipList' where
+    pure a = ZipList' $ repeat' a
+    ZipList' Nil <*> _ = ZipList' Nil
+    _ <*> ZipList' Nil = ZipList' Nil
+    ZipList' (Cons f fs) <*> ZipList' (Cons x xs) =
+        ZipList' (Cons (f x) tail)
+            where (ZipList' tail) = (ZipList' fs) <*> (ZipList' xs)
