@@ -204,3 +204,25 @@ instance Applicative ZipList' where
     ZipList' (Cons f fs) <*> ZipList' (Cons x xs) =
         ZipList' (Cons (f x) tail)
             where (ZipList' tail) = (ZipList' fs) <*> (ZipList' xs)
+
+data Validation e a =
+    Failure' e
+  | Success' a
+  deriving (Eq, Show)
+
+instance (Eq e, Eq a) => EqProp (Validation e a) where
+    (=-=) = eq
+
+instance (Arbitrary e, Arbitrary a) => Arbitrary (Validation e a) where
+    arbitrary = frequency [(1, liftM Failure' arbitrary), (1, liftM Success' arbitrary)]
+
+instance Functor (Validation e) where
+    fmap _ (Failure' e) = Failure' e
+    fmap f (Success' a) = Success' (f a)
+
+instance Monoid e => Applicative (Validation e) where
+    pure a = Success' a
+    Success' f <*> Success' a = Success' (f a)
+    Failure' e <*> Success' _ = Failure' e
+    Success' _ <*> Failure' e = Failure' e
+    Failure' e <*> Failure' e' = Failure' (e <> e')

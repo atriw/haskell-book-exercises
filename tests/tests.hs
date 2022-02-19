@@ -55,6 +55,11 @@ main = do
                 property (functorIdentity :: Three' String Int -> Bool)
             it "Property functorCompose for Three' should hold" $ do
                 property (functorCompose' :: Fun Int Int -> Fun Int Int -> Three' String Int -> Bool)
+    putStrLn "Pair"
     quickBatch $ applicative (Pair ("a", "b", "c") ("a", "b", "c"))
+    putStrLn "List"
     quickBatch $ applicative (Cons ("a", "b", "c") Nil)
+    putStrLn "ZipList'"
     quickBatch $ applicative (ZipList' (Cons ("a", "b", "c") Nil))
+    putStrLn "Validation"
+    quickBatch $ applicative (undefined :: Validation String (String, String, String))
