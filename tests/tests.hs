@@ -56,4 +56,4 @@ main = do
             it "Property functorCompose for Three' should hold" $ do
                 property (functorCompose' :: Fun Int Int -> Fun Int Int -> Three' String Int -> Bool)
     quickBatch $ applicative (Pair ("a", "b", "c") ("a", "b", "c"))
-    quickBatch $ 
+    quickBatch $ applicative (Cons ("a", "b", "c") Nil)
