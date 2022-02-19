@@ -57,6 +57,16 @@ main = do
                 property (functorCompose' :: Fun Int Int -> Fun Int Int -> Three' String Int -> Bool)
     putStrLn "Pair"
     quickBatch $ applicative (Pair ("a", "b", "c") ("a", "b", "c"))
+    putStrLn "Two"
+    quickBatch $ applicative (undefined :: Two String (String, String, String))
+    putStrLn "Three"
+    quickBatch $ applicative (undefined :: Three String String (String, String, String))
+    putStrLn "Three'"
+    quickBatch $ applicative (undefined :: Three' String (String, String, String))
+    putStrLn "Four"
+    quickBatch $ applicative (undefined :: Four String String String (String, String, String))
+    putStrLn "Four'"
+    quickBatch $ applicative (undefined :: Four' String (String, String, String))
     putStrLn "List"
     quickBatch $ applicative (Cons ("a", "b", "c") Nil)
     putStrLn "ZipList'"
