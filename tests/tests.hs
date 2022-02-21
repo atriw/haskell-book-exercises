@@ -73,3 +73,10 @@ main = do
     quickBatch $ applicative (ZipList' (Cons ("a", "b", "c") Nil))
     putStrLn "Validation"
     quickBatch $ applicative (undefined :: Validation String (String, String, String))
+    putStrLn "-----Monad-----"
+    putStrLn "Nope"
+    quickBatch $ monad (undefined :: Nope (String, String, String))
+    putStrLn "Identity"
+    quickBatch $ monad (undefined :: Identity (String, String, String))
+    putStrLn "List"
+    quickBatch $ monad (undefined :: List (String, String, String))

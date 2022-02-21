@@ -62,8 +62,18 @@ newtype Identity a = Identity a deriving (Eq, Show)
 instance (Arbitrary a) => Arbitrary (Identity a) where
     arbitrary = liftM Identity arbitrary
 
+instance (Eq a) => EqProp (Identity a) where
+    (=-=) = eq
+
 instance Functor Identity where
     fmap f (Identity a) = Identity (f a)
+
+instance Applicative Identity where
+    pure a = Identity a
+    Identity f <*> Identity a = Identity (f a)
+
+instance Monad Identity where
+    Identity a >>= f = f a
 
 data Pair a = Pair a a deriving (Eq, Show)
 
@@ -200,6 +210,10 @@ instance Applicative List where
     Cons f fs <*> xs =
         (fmap f xs) `append` (fs <*> xs)
 
+instance Monad List where
+    Nil >>= _ = Nil
+    Cons x xs >>= f = append (f x) (xs >>= f)
+
 append :: List a -> List a -> List a
 append Nil ys = ys
 append (Cons x xs) ys =
@@ -270,3 +284,21 @@ instance Monoid e => Applicative (Validation e) where
     Failure' e <*> Success' _ = Failure' e
     Success' _ <*> Failure' e = Failure' e
     Failure' e <*> Failure' e' = Failure' (e <> e')
+
+data Nope a = NopeDotJpg deriving (Eq, Show)
+
+instance EqProp (Nope a) where
+    (=-=) = eq
+
+instance Arbitrary (Nope a) where
+    arbitrary = return NopeDotJpg
+
+instance Functor Nope where
+    fmap _ NopeDotJpg = NopeDotJpg
+
+instance Applicative Nope where
+    pure _ = NopeDotJpg
+    NopeDotJpg <*> NopeDotJpg = NopeDotJpg
+
+instance Monad Nope where
+    NopeDotJpg >>= _ = NopeDotJpg
