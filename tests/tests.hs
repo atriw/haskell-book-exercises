@@ -80,3 +80,8 @@ main = do
     quickBatch $ monad (undefined :: Identity (String, String, String))
     putStrLn "List"
     quickBatch $ monad (undefined :: List (String, String, String))
+    putStrLn "-----Traversable-----"
+    putStrLn "Identity"
+    quickBatch $ traversable (undefined :: Identity (String, String, String))
+    putStrLn "List"
+    quickBatch $ traversable (undefined :: List (String, String, String))

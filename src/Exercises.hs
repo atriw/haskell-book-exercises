@@ -75,6 +75,12 @@ instance Applicative Identity where
 instance Monad Identity where
     Identity a >>= f = f a
 
+instance Foldable Identity where
+    foldMap f (Identity a) = f a
+
+instance Traversable Identity where
+    traverse f (Identity a) = Identity <$> f a
+
 data Pair a = Pair a a deriving (Eq, Show)
 
 instance (Arbitrary a) => Arbitrary (Pair a) where
@@ -213,6 +219,14 @@ instance Applicative List where
 instance Monad List where
     Nil >>= _ = Nil
     Cons x xs >>= f = append (f x) (xs >>= f)
+
+instance Foldable List where
+    foldMap f Nil = mempty
+    foldMap f (Cons x xs) = f x <> foldMap f xs
+
+instance Traversable List where
+    traverse _ Nil = pure Nil
+    traverse f (Cons x xs) = liftA2 Cons (f x) (traverse f xs)
 
 append :: List a -> List a -> List a
 append Nil ys = ys
