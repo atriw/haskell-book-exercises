@@ -5,6 +5,7 @@ import Test.QuickCheck
 import Test.QuickCheck.Function
 import Test.QuickCheck.Checkers
 import Test.QuickCheck.Classes
+import Data.Monoid
 
 import Exercises
 
@@ -55,6 +56,10 @@ main = do
                 property (functorIdentity :: Three' String Int -> Bool)
             it "Property functorCompose for Three' should hold" $ do
                 property (functorCompose' :: Fun Int Int -> Fun Int Int -> Three' String Int -> Bool)
+            it "Property functorIdentity for S should hold" $ do
+                property (functorIdentity :: S [] Int -> Bool)
+            it "Property functorCompose for S should hold" $ do
+                property (functorCompose' :: Fun Int Int -> Fun Int Int -> S [] Int -> Bool)
     putStrLn "Pair"
     quickBatch $ applicative (Pair ("a", "b", "c") ("a", "b", "c"))
     putStrLn "Two"
@@ -85,3 +90,7 @@ main = do
     quickBatch $ traversable (undefined :: Identity (String, String, String))
     putStrLn "List"
     quickBatch $ traversable (undefined :: List (String, String, String))
+    putStrLn "S"
+    quickBatch $ traversable (undefined :: S Maybe (Sum Int, Sum Int, Sum Int))
+    putStrLn "Tree"
+    quickBatch $ traversable (undefined :: Tree (String, String, String))

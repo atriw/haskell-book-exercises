@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleContexts #-}
+
 module Exercises where
 
 import Test.QuickCheck
@@ -316,3 +318,47 @@ instance Applicative Nope where
 
 instance Monad Nope where
     NopeDotJpg >>= _ = NopeDotJpg
+
+data S n a = S (n a) a deriving (Eq, Show)
+
+instance (Functor n, Arbitrary (n a), Arbitrary a) => Arbitrary (S n a) where
+    arbitrary = liftA2 S arbitrary arbitrary
+
+instance (Applicative n, Testable (n Property), EqProp a) => EqProp (S n a) where
+    (S x y) =-= (S p q) = (property $ liftA2 (=-=) x p) .&. (y =-= q)
+
+instance Functor n => Functor (S n) where
+    fmap f (S na a) = S (fmap f na) (f a)
+
+instance Foldable n => Foldable (S n) where
+    foldMap f (S na a) = (foldMap f na) <> (f a)
+
+instance Traversable n => Traversable (S n) where
+    traverse f (S na a) = liftA2 S (traverse f na) (f a)
+
+data Tree a =
+    Empty
+  | Leaf a
+  | Node (Tree a) a (Tree a)
+  deriving (Eq, Show)
+
+instance Arbitrary a => Arbitrary (Tree a) where
+    arbitrary = frequency [(1, return Empty), (4, Leaf <$> arbitrary), (4, liftA3 Node arbitrary arbitrary arbitrary)]
+
+instance Eq a => EqProp (Tree a) where
+    (=-=) = eq
+
+instance Functor Tree where
+    fmap _ Empty = Empty
+    fmap f (Leaf a) = Leaf (f a)
+    fmap f (Node left a right) = Node (fmap f left) (f a) (fmap f right)
+
+instance Foldable Tree where
+    foldMap _ Empty = mempty
+    foldMap f (Leaf a) = f a
+    foldMap f (Node left a right) = foldMap f left <> f a <> foldMap f right
+
+instance Traversable Tree where
+    traverse _ Empty = pure Empty
+    traverse f (Leaf a) = Leaf <$> f a
+    traverse f (Node left a right) = liftA3 Node (traverse f left) (f a) (traverse f right)
