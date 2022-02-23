@@ -362,3 +362,17 @@ instance Traversable Tree where
     traverse _ Empty = pure Empty
     traverse f (Leaf a) = Leaf <$> f a
     traverse f (Node left a right) = liftA3 Node (traverse f left) (f a) (traverse f right)
+
+newtype Reader r a =
+    Reader { runReader :: r -> a }
+
+instance Functor (Reader r) where
+    fmap f (Reader ra) = Reader $ (f . ra)
+
+instance Applicative (Reader r) where
+    pure a = Reader $ \_ -> a
+    Reader rab <*> Reader ra =
+        Reader $ \r -> rab r (ra r)
+
+instance Monad (Reader r) where
+    Reader ra >>= aRb = Reader $ \r -> runReader (aRb (ra r)) $ r
